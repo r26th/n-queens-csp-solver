@@ -93,7 +93,7 @@ def nqueen_FC(n):
  
  
 # the program starts from here 
-if name == "__main__": 
+if __name__ == "__main__": 
      
     sizes = [4, 8, 16, 32, 64]  
      

@@ -74,7 +74,7 @@ def nqueen_BT(n):
     return solution, runtime, constraint_checks, found_solution 
  
 # the program starts from here 
-if name == "__main__": 
+if __name__ == "__main__": 
      
     sizes = [4, 8, 16, 32, 64]  
      
