@@ -1,33 +1,104 @@
-from nqueens import NQueensCSP
 import time
+from nqueens import NQueensCSP
 
-sizes = [4, 8, 16, 32, 64]
+# ==========================================
+# Main Execution Block
+# ==========================================
+if __name__ == "__main__":
+    sizes = [4, 8, 16, 32, 64] 
+    summary_table = [] # Store data here to print a clean table at the end
 
-print(f"{'N':<5} {'Algorithm':<10} {'Time(s)':<10} {'Checks':<15} {'Result'}")
-print("-" * 60)
+    print("\n" + "="*60)
+    print(f"{'N-QUEENS SOLVER EXECUTION LOG':^60}")
+    print("="*60)
 
-for N in sizes:
-    
-    if N < 20:
+    for N in sizes:
+        print(f"\n>>> Processing Board Size: N = {N}")
+        print("-" * 40)
+
+        # ---------------------------------------
+        # 1. Run BT (Skip if N >= 20)
+        # ---------------------------------------
+        if N < 20:
+            solver = NQueensCSP(N)
+            start = time.time()
+            solution = solver.solve_bt()
+            duration = time.time() - start
+            
+            result_str = "Found" if solution else "Fail"
+            time_str = f"{duration:.4f}"
+            checks_str = f"{solver.constraint_checks}"
+            
+            print(f"  [BT] Time: {time_str}s | Checks: {checks_str} | Result: {result_str}")
+            if solution:
+                path = [solution[i] for i in range(N)]
+                path_str = str(path)
+                
+                print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
+                print(f"      > Solution Path: {path_str}")
+            
+            summary_table.append((N, "BT", time_str, checks_str, result_str))
+        else:
+            print(f"  [BT] Skipped (Timeout Risk)")
+            summary_table.append((N, "BT", "> 1200s", "---", "Timeout"))
+
+        print("") # Spacer
+
+        # ---------------------------------------
+        # 2. Run FC
+        # ---------------------------------------
         solver = NQueensCSP(N)
         start = time.time()
-        sol = solver.solve_bt()
-        dur = time.time() - start
-        print(f"{N:<5} {'BT':<10} {dur:<10.4f} {solver.constraint_checks:<15} {'Found' if sol else 'Fail'}")
-    else:
-        print(f"{N:<5} {'BT':<10} {'> 1200s':<10} {'---':<15} {'Timeout'}")
+        solution = solver.solve_fc()
+        duration = time.time() - start
+        
+        result_str = "Found" if solution else "Fail"
+        time_str = f"{duration:.4f}"
+        checks_str = f"{solver.constraint_checks}"
+        
+        print(f"  [FC] Time: {time_str}s | Checks: {checks_str} | Result: {result_str}")
+        if solution:
+            path = [solution[i] for i in range(N)]
+            path_str = str(path)
 
-    # FC
-    solver = NQueensCSP(N)
-    start = time.time()
-    sol = solver.solve_fc()
-    dur = time.time() - start
-    print(f"{N:<5} {'FC':<10} {dur:<10.4f} {solver.constraint_checks:<15} {'Found' if sol else 'Fail'}")
+            print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
+            print(f"      > Solution Path: {path_str}")
 
-    # MAC
-    solver = NQueensCSP(N)
-    start = time.time()
-    sol = solver.solve_mac()
-    dur = time.time() - start
-    print(f"{N:<5} {'MAC':<10} {dur:<10.4f} {solver.constraint_checks:<15} {'Found' if sol else 'Fail'}")
-    print("-" * 60)
+        summary_table.append((N, "FC", time_str, checks_str, result_str))
+        print("") # Spacer
+
+        # ---------------------------------------
+        # 3. Run MAC
+        # ---------------------------------------
+        solver = NQueensCSP(N)
+        start = time.time()
+        solution = solver.solve_mac()
+        duration = time.time() - start
+        
+        result_str = "Found" if solution else "Fail"
+        time_str = f"{duration:.4f}"
+        checks_str = f"{solver.constraint_checks}"
+        
+        print(f"  [MAC] Time: {time_str}s | Checks: {checks_str} | Result: {result_str}")
+        if solution:
+            path = [solution[i] for i in range(N)]
+            path_str = str(path)
+        
+            print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
+            print(f"      > Solution Path: {path_str}")
+
+        summary_table.append((N, "MAC", time_str, checks_str, result_str))
+
+    # ==========================================
+    # FINAL SUMMARY TABLE
+    # ==========================================
+    print("\n" + "="*75)
+    print(f"{'FINAL PERFORMANCE SUMMARY':^75}")
+    print("="*75)
+    print(f"{'N':<5} {'Algorithm':<10} {'Time(s)':<12} {'Checks':<15} {'Result'}")
+    print("-" * 75)
+    
+    for row in summary_table:
+        n_val, name, t_val, c_val, res = row
+        print(f"{n_val:<5} {name:<10} {t_val:<12} {c_val:<15} {res}")
+    print("-" * 75)
