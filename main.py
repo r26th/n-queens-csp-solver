@@ -1,6 +1,18 @@
 import time
 from nqueens import NQueensCSP
 
+def print_board(assignment, n):
+    print("\n Board:")
+    for row in range(n):
+        line = ""
+        for col in range(n):
+            if col in assignment and assignment[col] == row:
+                line += " ♕ "
+            else:
+                line += " □ "
+        print(line)
+    print()
+
 # ==========================================
 # Main Execution Block
 # ==========================================
@@ -11,6 +23,7 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print(f"{'N-QUEENS SOLVER EXECUTION LOG':^60}")
     print("="*60)
+   
 
     for N in sizes:
         print(f"\n>>> Processing Board Size: N = {N}")
@@ -36,7 +49,9 @@ if __name__ == "__main__":
                 
                 print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
                 print(f"      > Solution Path: {path_str}")
-            
+                print_board(solution, N)
+
+   
             summary_table.append((N, "BT", time_str, checks_str, result_str))
         else:
             print(f"  [BT] Skipped (Timeout Risk)")
@@ -63,6 +78,10 @@ if __name__ == "__main__":
 
             print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
             print(f"      > Solution Path: {path_str}")
+            
+            if N!=64:
+                print_board(solution, N)
+
 
         summary_table.append((N, "FC", time_str, checks_str, result_str))
         print("") # Spacer
@@ -86,6 +105,9 @@ if __name__ == "__main__":
         
             print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
             print(f"      > Solution Path: {path_str}")
+             
+            if N!=64:
+                print_board(solution, N)
 
         summary_table.append((N, "MAC", time_str, checks_str, result_str))
 

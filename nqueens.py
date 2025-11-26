@@ -1,7 +1,6 @@
 import time
 import copy
 import random
-
 class NQueensCSP:
     def __init__(self, n):
         self.n = n
@@ -137,22 +136,29 @@ class NQueensCSP:
 
     def ac3(self, assignment, domains):
         queue = []
+
+        all_vars = list(range(self.n))
+
         assigned_vars = list(assignment.keys())
-        unassigned_vars = [v for v in range(self.n) if v not in assigned_vars]
-        
+
+        unassigned_vars = [v for v in all_vars if v not in assigned_vars]
+
         for xi in unassigned_vars:
-            for xj in unassigned_vars:
+            for xj in all_vars:
                 if xi != xj:
                     queue.append((xi, xj))
-        
+
         while queue:
             (xi, xj) = queue.pop(0)
+
             if self.revise(xi, xj, domains):
                 if len(domains[xi]) == 0:
                     return False
-                for xk in unassigned_vars:
+
+                for xk in all_vars:
                     if xk != xi and xk != xj:
                         queue.append((xk, xi))
+
         return True
 
     def revise(self, xi, xj, domains):
@@ -169,6 +175,7 @@ class NQueensCSP:
                 domains[xi].remove(x)
                 revised = True
         return revised
+
 
     def _mac_recursive(self, assignment, domains):
         if time.time() - self.start_time > 1200: return None
