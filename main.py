@@ -82,7 +82,6 @@ if __name__ == "__main__":
         if solution:
             path = [solution[i] for i in range(N)]
             path_str = str(path)
-            if len(path_str) > 80: path_str = path_str[:80] + "..."
             
             print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
             print(f"      > Solution Path: {path_str}")
@@ -107,7 +106,6 @@ if __name__ == "__main__":
         if solution:
             path = [solution[i] for i in range(N)]
             path_str = str(path)
-            if len(path_str) > 80: path_str = path_str[:80] + "..."
             
             print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
             print(f"      > Solution Path: {path_str}")
