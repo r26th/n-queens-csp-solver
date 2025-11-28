@@ -1,29 +1,39 @@
 import time
-from nqueens import NQueensCSP
+from nqueensH import NQueensCSP
 
-def print_board(assignment, n):
-    print("\n Board:")
+# ==========================================
+# Helper: Print the Board
+# ==========================================
+def print_board(solution, n):
+    """
+    Visualizes the N-Queens solution.
+    solution: list where index=col, value=row
+    """
+    # Only print board if N is small enough to fit on screen
+    if n > 32: 
+        print(f"      > [Board too large to print visually (N={n})]")
+        return
+
+    print(f"      > Board Visualization:")
     for row in range(n):
-        line = ""
+        line = "        "  # Indentation for clean look
         for col in range(n):
-            if col in assignment and assignment[col] == row:
-                line += " ♕ "
+            if solution[col] == row:
+                line += " ♕ "  # Queen
             else:
-                line += " □ "
+                line += " □ "  # Empty square
         print(line)
-    print()
 
 # ==========================================
 # Main Execution Block
 # ==========================================
 if __name__ == "__main__":
     sizes = [4, 8, 16, 32, 64] 
-    summary_table = [] # Store data here to print a clean table at the end
+    summary_table = [] 
 
     print("\n" + "="*60)
     print(f"{'N-QUEENS SOLVER EXECUTION LOG':^60}")
     print("="*60)
-   
 
     for N in sizes:
         print(f"\n>>> Processing Board Size: N = {N}")
@@ -45,13 +55,10 @@ if __name__ == "__main__":
             print(f"  [BT] Time: {time_str}s | Checks: {checks_str} | Result: {result_str}")
             if solution:
                 path = [solution[i] for i in range(N)]
-                path_str = str(path)
-                
                 print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
-                print(f"      > Solution Path: {path_str}")
-                print_board(solution, N)
-
-   
+                print(f"      > Solution Path: {path}")
+                print_board(solution, N) # <--- CALL THE BOARD PRINTER
+            
             summary_table.append((N, "BT", time_str, checks_str, result_str))
         else:
             print(f"  [BT] Skipped (Timeout Risk)")
@@ -75,13 +82,11 @@ if __name__ == "__main__":
         if solution:
             path = [solution[i] for i in range(N)]
             path_str = str(path)
-
+            if len(path_str) > 80: path_str = path_str[:80] + "..."
+            
             print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
             print(f"      > Solution Path: {path_str}")
-            
-            if N!=64:
-                print_board(solution, N)
-
+            print_board(solution, N) # <--- CALL THE BOARD PRINTER
 
         summary_table.append((N, "FC", time_str, checks_str, result_str))
         print("") # Spacer
@@ -102,12 +107,11 @@ if __name__ == "__main__":
         if solution:
             path = [solution[i] for i in range(N)]
             path_str = str(path)
-        
+            if len(path_str) > 80: path_str = path_str[:80] + "..."
+            
             print(f"      > Random Start: Queen 0 was placed at Row {path[0]}")
             print(f"      > Solution Path: {path_str}")
-             
-            if N!=64:
-                print_board(solution, N)
+            print_board(solution, N) # <--- CALL THE BOARD PRINTER
 
         summary_table.append((N, "MAC", time_str, checks_str, result_str))
 
