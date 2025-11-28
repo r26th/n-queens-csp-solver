@@ -1,6 +1,7 @@
 import time
 import copy
 import random
+
 class NQueensCSP:
     def __init__(self, n):
         self.n = n
@@ -14,24 +15,20 @@ class NQueensCSP:
     # ==========================================
     def select_unassigned_variable(self, assignment, domains):
         """
-        MRV Heuristic: Select variable with fewest remaining values.
-        If there is a tie, pick a random one among the best candidates.
+        MRV with simple degree heuristic tie-breaking
         """
-        # 1. Get all unassigned variables
         unassigned_vars = [v for v in range(self.n) if v not in assignment]
         
         if not unassigned_vars:
             return None
 
-        # 2. Find the smallest domain size currently available
+        # Find minimum domain size
         min_size = min(len(domains[v]) for v in unassigned_vars)
-        
-        # 3. Find ALL variables that have this specific size (the ties)
         candidates = [v for v in unassigned_vars if len(domains[v]) == min_size]
         
-        # 4. Pick one randomly
-        return random.choice(candidates)
-
+        # Simple degree heuristic: in N-Queens, all variables have same degree,
+        # so we'll just pick the first one (deterministic)
+        return candidates[0]  # This makes it consistent and deterministic
     # ==========================================
     # CONSISTENCY CHECK (Required for BT)
     # ==========================================
@@ -129,43 +126,54 @@ class NQueensCSP:
     # ==========================================
     # 3. Maintaining Arc Consistency (MAC) WITH MRV
     # ==========================================
+    
     def solve_mac(self):
         self.constraint_checks = 0
         self.start_time = time.time()
         return self._mac_recursive({}, copy.deepcopy(self.domains))
 
-    def ac3(self, assignment, domains):
+    def ac3(self, assignment, domains, last_assigned_var):
         queue = []
+        
+        # 1. Identify which variables are still unassigned
+        unassigned_vars = [v for v in range(self.n) if v not in assignment]
+        
+        # 2. CRITICAL FIX: Add constraints between Unassigned vars and the Last Assigned var
+        #    This ensures future queens don't attack the one we just placed.
+        if last_assigned_var is not None:
+            for xi in unassigned_vars:
+                queue.append((xi, last_assigned_var))
 
-        all_vars = list(range(self.n))
-
-        assigned_vars = list(assignment.keys())
-
-        unassigned_vars = [v for v in all_vars if v not in assigned_vars]
-
+        # 3. Add constraints between all Unassigned variables (Propagate consistency)
         for xi in unassigned_vars:
-            for xj in all_vars:
+            for xj in unassigned_vars:
                 if xi != xj:
                     queue.append((xi, xj))
-
+        
+        # 4. Process the Queue
         while queue:
             (xi, xj) = queue.pop(0)
-
+            
             if self.revise(xi, xj, domains):
+                # If domain of xi becomes empty, we found a conflict
                 if len(domains[xi]) == 0:
                     return False
-
-                for xk in all_vars:
+                
+                # If we removed values from xi, we must re-check its neighbors
+                for xk in unassigned_vars:
                     if xk != xi and xk != xj:
                         queue.append((xk, xi))
-
         return True
 
     def revise(self, xi, xj, domains):
         revised = False
+        # Iterate over a copy of the domain
         for x in domains[xi][:]:
             has_support = False
             for y in domains[xj]:
+                # Check if value 'x' for var 'xi' is compatible with value 'y' for var 'xj'
+                # 1. Row Constraint (y != x)
+                # 2. Diagonal Constraint (|y - x| != |xj - xi|)
                 if x != y and abs(x - y) != abs(xi - xj):
                     has_support = True
                     break
@@ -176,27 +184,28 @@ class NQueensCSP:
                 revised = True
         return revised
 
-
     def _mac_recursive(self, assignment, domains):
         if time.time() - self.start_time > 1200: return None
         if len(assignment) == self.n: return assignment
 
-        # USE MRV HERE
+        # MRV Heuristic
         var = self.select_unassigned_variable(assignment, domains)
 
-        # RANDOM REQUIREMENT
+        # Randomize values
         values_to_try = list(domains[var])
         random.shuffle(values_to_try)
 
         for value in values_to_try:
             new_domains = copy.deepcopy(domains)
             assignment[var] = value
-            new_domains[var] = [value]
+            new_domains[var] = [value] # Lock the domain to this value
             
-            if self.ac3(assignment, new_domains):
+            # Pass 'var' to AC3 so it knows what changed
+            if self.ac3(assignment, new_domains, last_assigned_var=var):
                 result = self._mac_recursive(assignment, new_domains)
                 if result: return result
             
             del assignment[var]
         
         return None
+
