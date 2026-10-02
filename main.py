@@ -1,5 +1,5 @@
 import time
-from nqueensH import NQueensCSP
+from nqueens import NQueensCSP
 
 # ==========================================
 # Helper: Print the Board
